@@ -40,6 +40,7 @@ DEFAULT_ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
     'localhost:8000',
+      'suits-me.herokuapp.com',
     'suits_me.onrender.com',
     '64af3df035ed.ngrok-free.app',
     'www.suitsme.com',
@@ -128,8 +129,7 @@ WSGI_APPLICATION = 'suits_me.wsgi.application'
 DATABASES = {
     'default': dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600,
-        ssl_require=True,
+        conn_max_age=600
     )
 }
 
