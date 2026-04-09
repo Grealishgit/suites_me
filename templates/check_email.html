@@ -1,0 +1,175 @@
+{% extends 'logins.html' %}
+{% load static %}
+
+{% block content %}
+    <style>
+
+        /* Main Content */
+        .container {
+            flex: 1;
+            padding: 2rem 1.5rem;
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Email Card */
+        .email-card {
+            background: linear-gradient(90deg,#3c54f0,#ce6cff);
+            padding: 0.9rem 1rem;
+            border-radius: 8px;
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+      
+
+        .email-card svg {
+            width: 50px;
+            height: 50px;
+            stroke: white;
+            stroke-width: 2;
+            padding-bottom: 0;
+            margin-bottom: 0;
+            fill: none;
+        }
+
+        .email-card h1 {
+            font-size: 1.5rem;
+            padding: 0;
+            margin: 0;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+        }
+
+        .email-card p {
+            font-size: 1rem;
+            opacity: 0.95;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* Form Section */
+        .form-section {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            color: #999;
+            font-size: 0.9rem;
+            margin-bottom: 0.1rem;
+            display: block;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.2rem 0;
+            border: none;
+            border-bottom: 1px solid #ddd;
+            font-size: 1rem;
+            outline: none;
+            background: transparent;
+        }
+
+        /* Links */
+        .link-button {
+            background: white;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            text-align: center;
+            color: #333;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            border: none;
+            width: 100%;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .link-button:hover {
+            background: #f8f8f8;
+        }
+        /* Mobile specific styles */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem 1rem;
+            }
+            .email-card {
+                padding: 0.9rem 0.7rem;
+                border-radius: 8px;
+            }
+            .email-card svg {
+                width: 50px;
+                height: 50px;
+            }
+            .email-card h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Email Notification Card -->
+        <div class="email-card">
+            <svg viewBox="0 0 24 24">
+                <rect x="2" y="4" width="20" height="16" rx="2" ry="2"/>
+                <path d="M2 7l10 7 10-7"/>
+            </svg>
+            <h1>Check your email</h1>
+            <p>We've emailed you a code to log in to the app</p>
+        </div>
+
+        <!-- Verification Code Input -->
+        <form method="post" action="{% url 'check_email' %}">
+            {% csrf_token %}
+            <div class="form-section">
+                <label class="form-label">Paste verification code from your email</label>
+                {{ form.verification_code }}
+                {% if form.verification_code.errors %}
+                    <div style="color: red; font-size: 0.85rem; margin-top: 0.5rem;">
+                        {{ form.verification_code.errors }}
+                    </div>
+                {% endif %}
+            </div>
+            <button type="submit" class="link-button">Submit</button>
+        </form>
+        <!-- Resend Email Button -->
+        <button class="link-button" onclick="resendEmail()">Resend Email</button>
+    </div>
+
+
+
+    <script>
+        function resendEmail() {
+            alert('Resending email...');
+            // Add your resend email logic here
+        }
+
+        function openCustomerCare() {
+            alert('Opening customer care...');
+            // Add your customer care logic here
+        }
+
+        // Auto-focus on verification code input
+        const verificationInput = document.getElementById('verificationCode');
+        if (verificationInput) {
+            verificationInput.focus();
+        }
+
+        function resetProcess() {
+            window.location.href = "{% url 'home' %}";
+        }
+    </script>
+{% endblock %}
+
+{% block footer_left %}
+<button type="button" class="reset-button" onclick="resetProcess()">Reset</button>
+{% endblock %}

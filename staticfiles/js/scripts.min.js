@@ -1,0 +1,1 @@
+"use strict";document.addEventListener("DOMContentLoaded",function(){document.querySelector(".apply-thank-you-page")&&window.self!==window.top&&(window.top.location=window.location)});

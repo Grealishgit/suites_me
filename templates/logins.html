@@ -1,0 +1,526 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="{% static 'images/SuitsMe_Favicon_180x180_Gradient.svg' %}" sizes="32x32">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Suits Me - Personal details confirmation"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Suits Me</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
+        *,
+        *::before,
+        *::after {
+          box-sizing: border-box;
+        }
+
+:root {
+  color: #0f0f0f;
+  background-color: #ffffff;
+}
+@font-face {
+  font-family: "ESBuild";
+  src: url("{% static 'fonts/ES-Build-Medium.woff2' %}") format("woff2"),
+       url("{% static 'fonts/ES-Build-Medium.woff' %}") format("woff");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  outline: none;
+  border: none;
+  box-sizing: border-box;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  font-family: "DM Sans", sans-serif;
+}
+
+.hero {
+    background: #815ff6;
+    background: linear-gradient(45deg,#3c54f0,#ce6cff);
+    display: flex;
+    flex-wrap: nowrap;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#3c54f0",endColorstr="#ce6cff",GradientType=1);
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.logo {
+    height: 40px;
+}
+
+.logo-mark {
+  font-weight: 600;
+  font-size: 1.2rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.15);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: lowercase;
+}
+
+.logo-text {
+  font-weight: 600;
+}
+
+.language-selector {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.language-toggle {
+  border: none;
+  background-color: transparent;
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.language-toggle:hover,
+.language-toggle:focus-visible,
+.language-toggle.is-open {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.language-toggle .flag-icon {
+  width: 24px;
+  height: 17px;
+  border-radius: 0;
+  object-fit: cover;
+  border: none;
+}
+
+.language-toggle .chevron {
+font-size: 1rem;
+}
+
+.language-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  width: 150px;
+  background-color: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+  padding: 4px 0;
+  list-style: none;
+  margin: 0;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  display: none;
+  z-index: 5;
+  font-family: 'Arial', sans-serif;
+}
+
+.language-menu.is-open {
+  display: block;
+}
+
+.language-option {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 10px 18px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #0f0f0f;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.language-option + .language-option {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.language-option.primary {
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+
+.language-option:hover {
+  background-color: rgba(173, 82, 255, 0.08);
+}
+
+.language-option .flag-icon {
+  width: 28px;
+  height: 18px;
+  border-radius: 0;
+  object-fit: cover;
+  border: none;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 60px;
+}
+
+.panel {
+  max-width: 460px;
+  width: 100%;
+  text-align: center;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 40px;
+  font-family: "ESBuild", "DM Sans", "Segoe UI", system-ui, -apple-system,
+    sans-serif;
+  font-weight: 600;
+  color: #000000;
+  line-height: 1.2;
+}
+
+.panel h1 {
+  margin: 12px 0 48px;
+  font-weight: 400;
+  font-size: 20px;
+  color: #000000;
+  font-family: "DM Sans", sans-serif;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  font-family: "DM Sans", sans-serif;
+  gap: 24px;
+}
+
+.form input,
+.form .email-input {
+  border: none;
+  border-bottom: 1px solid #dedede;
+  padding: 24px 8px 8px;
+  font-size: 1.05rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+  font-family: "DM Sans", sans-serif;
+}
+
+.form .email-input::placeholder {
+  font-size: 20px;
+  color: #bebcbc;
+  font-family: "DM Sans", sans-serif;
+}
+
+
+.form button {
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  width: 98%;
+  margin: 0 auto;
+  padding: 15px 15px;
+  font-size: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  font-family: "DM Sans", sans-serif;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.form button:hover {
+  opacity: 0.85;
+}
+
+.form button .submit-text {
+  transition: opacity 0.2s ease;
+}
+
+.form button .spinner {
+  display: none;
+  font-size: 1.3rem;
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-30%, -50%);
+  pointer-events: none;
+}
+
+.form button.is-loading {
+  background-color: #b3b3b3;
+  cursor: wait;
+  color: transparent;
+}
+
+.form button.is-loading .spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+.form button.is-loading .submit-text {
+  opacity: 0;
+}
+
+.error-text {
+  color: #d93025;
+  font-size: 0.9rem;
+  margin-top: -12px;
+  text-align: left;
+  font-family: "DM Sans", sans-serif;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.help {
+  position: fixed;
+  right: -10px;
+  bottom: 10px;
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  font-family: "DM Sans", sans-serif;
+}
+
+.reset-button {
+  position: fixed;
+  left: 10px;
+  bottom: 10px;
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  font-family: "DM Sans", sans-serif;
+}
+
+.reset-button:hover {
+  opacity: 0.85;
+}
+
+.cobrand {
+  position: fixed;
+  left: 10px;
+  bottom: 10px;
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  background-color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: 600;
+  text-transform: lowercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.cobrand svg {
+    height: 48px;
+    transition: all 0s ease;
+    transition-delay: .2s;
+    width: 48px;
+}
+
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 600px) {
+  .hero {
+    gap: 6px;
+    padding: 20px;
+  }
+  .content {
+    margin-bottom: 74px;
+  }
+  .form button {
+    padding: 15px;
+    font-size: 16px;
+  }
+  .form .email-input::placeholder {
+  font-size: 16px;
+}
+  .eyebrow {
+    font-size: 30px;
+  }
+  .form input,
+  .form .email-input {
+   margin-bottom: 15px;
+  }
+  .panel h1 {
+    font-size: 16px;
+    margin-top:15px;
+    margin-bottom: 36px;
+  }
+}
+
+
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      
+        <img src="{% static 'images/SuitsMe_Logo_Whiteout.svg' %}" alt="Suits Me Logo" class="logo">
+   
+      <div class="language-selector">
+        <button class="language-toggle" type="button" id="languageToggle" aria-haspopup="true" aria-expanded="false">
+          <img src="{% static 'images/flags/gb-rect.svg' %}" alt="" class="flag-icon" aria-hidden="true">
+          English
+          <i class="fa-solid fa-chevron-down chevron" aria-hidden="true"></i>
+        </button>
+        <ul class="language-menu" id="languageMenu" role="menu">
+          <li class="language-option primary" role="menuitem">
+            <img src="{% static 'images/flags/gb-rect.svg' %}" alt="" class="flag-icon" aria-hidden="true">
+            English
+          </li>
+          <li class="language-option" role="menuitem">
+            <img src="{% static 'images/flags/bg-rect.svg' %}" alt="" class="flag-icon" aria-hidden="true">
+            български
+          </li>
+          <li class="language-option" role="menuitem">
+            <img src="{% static 'images/flags/ro-rect.svg' %}" alt="" class="flag-icon" aria-hidden="true">
+            Română
+          </li>
+          <li class="language-option" role="menuitem">
+            <img src="{% static 'images/flags/pl-rect.svg' %}" alt="" class="flag-icon" aria-hidden="true">
+            Polski
+          </li>
+        </ul>
+      </div>
+    </header>
+
+    <main class="content">
+      {% block content %}
+      <section class="panel" aria-labelledby="panel-title">
+        <p class="eyebrow">Personal details</p>
+        <h1 id="panel-title">Enter your email address</h1>
+
+        <form class="form" id="emailForm" action="{% url 'login' %}" method="post">
+          {% csrf_token %}
+          <label class="sr-only" for="id_email">Email</label>
+          {{ form.email }}
+          {% if form.email.errors %}
+            <div class="error-text">
+              {{ form.email.errors|striptags }}
+            </div>
+          {% endif %}
+          <button type="submit" id="submitBtn">
+            <span class="submit-text">Confirm</span>
+            <i class="fa-solid fa-spinner fa-spin spinner" aria-hidden="true"></i>
+          </button>
+        </form>
+      </section>
+      {% endblock %}
+    </main>
+
+    <a href="https://support.suitsmecard.com/hc/en-gb/requests/new" class="help" type="button">Help</a>
+    {% block footer_left %}
+    <div class="cobrand" aria-label="customer operations">
+        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g fill-rule="evenodd"><circle cx="12" cy="12" r="12"></circle><path d="M15.094 13.978c-1.146 0-1.946-.813-1.946-1.978s.8-1.978 1.946-1.978c1.145 0 1.945.813 1.945 1.978s-.8 1.978-1.945 1.978M9.07 10.022h3.883l-.094.09c-.537.515-.844 1.203-.844 1.888 0 1.738 1.294 3 3.079 3 1.786 0 3.082-1.262 3.082-3s-1.296-3-3.082-3H9.079C7.295 9 6 10.262 6 12s1.295 3 3.079 3h2.144v-1.022H9.07c-1.136 0-1.932-.813-1.937-1.978 0-1.146.815-1.978 1.937-1.978" fill="#fff"></path></g></svg>
+    </div>
+    {% endblock %}
+    <script>
+      const form = document.getElementById('emailForm');
+      const submitBtn = document.getElementById('submitBtn');
+      const emailInput =
+        document.getElementById('email-input') ||
+        document.getElementById('id_email') ||
+        document.getElementById('email');
+      const languageToggle = document.getElementById('languageToggle');
+      const languageMenu = document.getElementById('languageMenu');
+
+      if (form && submitBtn) {
+        submitBtn.addEventListener('click', function () {
+          if (!submitBtn.classList.contains('is-loading')) {
+            submitBtn.classList.add('is-loading');
+          }
+        });
+
+        form.addEventListener('submit', function (event) {
+          if (!emailInput || emailInput.value.trim() === '') {
+            event.preventDefault();
+            submitBtn.classList.remove('is-loading');
+            submitBtn.disabled = false;
+            return;
+          }
+          submitBtn.disabled = true;
+        });
+      }
+
+      if (languageToggle && languageMenu) {
+        const closeMenu = () => {
+          languageMenu.classList.remove('is-open');
+          languageToggle.setAttribute('aria-expanded', 'false');
+          languageToggle.classList.remove('is-open');
+        };
+
+        languageToggle.addEventListener('click', () => {
+          const isOpen = languageMenu.classList.toggle('is-open');
+          languageToggle.setAttribute('aria-expanded', String(isOpen));
+          languageToggle.classList.toggle('is-open', isOpen);
+        });
+
+        document.addEventListener('click', (event) => {
+          if (
+            !languageMenu.contains(event.target) &&
+            event.target !== languageToggle
+          ) {
+            closeMenu();
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

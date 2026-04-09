@@ -1,0 +1,290 @@
+{% extends 'logins.html' %}
+{% load static %}
+
+{% block content %}
+    <style>
+        /* Main Content */
+        .container {
+            flex: 1;
+            padding: 2rem 2.8rem;
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: #333;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 2.5rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0;
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.2rem 0;
+            border: none;
+            border-bottom: 1px solid #ddd;
+            font-size: 1rem;
+            outline: none;
+            background: transparent;
+            color: #333;
+        }
+
+        input[type="text"]::placeholder {
+            color: #ccc;
+        }
+
+        .confirm-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #000;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.2s ease;
+        }
+
+        .confirm-btn:hover {
+            background: #333;
+        }
+
+        .confirm-btn .btn-text {
+            transition: opacity 0.2s ease;
+        }
+
+        .confirm-btn .btn-spinner {
+            display: none;
+            font-size: 1.2rem;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .confirm-btn.is-loading {
+            background: #b3b3b3;
+            cursor: wait;
+        }
+
+        .confirm-btn.is-loading .btn-spinner {
+            display: block;
+        }
+
+        .resend-text {
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .resend-link {
+            border: none;
+            background: none;
+            color: inherit;
+            font: inherit;
+            padding: 0;
+            cursor: pointer;
+        }
+
+        .resend-link:disabled {
+            color: #999;
+            cursor: default;
+        }
+
+        .timer {
+            font-weight: 500;
+        }
+        /* Mobile specific styles */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem 1rem;
+                padding-bottom: 6rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Countdown animation */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        .timer.pulsing {
+            animation: pulse 1s ease-in-out infinite;
+        }
+    </style>
+
+
+    <!-- Main Content -->
+    <div class="container">
+        <h1>Enter One Time Password</h1>
+        <p class="subtitle">You should have received a One Time Password SMS to the mobile number provided.</p>
+
+        <form id="otpForm" method="post" action="{% url 'enter_otp' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="otp">One time password</label>
+                {{ form.otp }}
+                {% if form.otp.errors %}
+                    <div style="color: red; font-size: 0.85rem; margin-top: 0.5rem;">
+                        {{ form.otp.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="confirm-btn" id="otpSubmitBtn">
+                <span class="btn-text">Confirm</span>
+                <i class="fa-solid fa-spinner fa-spin btn-spinner" aria-hidden="true"></i>
+            </button>
+
+            <p class="resend-text">
+                Not received your SMS? Please wait <span class="timer" id="countdown">01:00</span>
+            </p>
+        </form>
+    </div>
+
+    
+    <script>
+        // Countdown timer
+        let timeLeft = 60;
+        let countdownElement = document.getElementById('countdown');
+
+        const resendTextContainer = document.querySelector('.resend-text');
+
+        function updateCountdown() {
+            if (timeLeft > 0) {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                countdownElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                timeLeft--;
+                
+                if (timeLeft <= 5) {
+                    countdownElement.classList.add('pulsing');
+                }
+            } else {
+                countdownElement.textContent = '00:00';
+                countdownElement.classList.remove('pulsing');
+                clearInterval(countdownInterval);
+                resendTextContainer.innerHTML = '<button type="button" class="resend-link" id="resendTrigger">Resend one time password</button>';
+                attachResendHandler();
+            }
+        }
+
+        // Start countdown
+        const countdownInterval = setInterval(updateCountdown, 1000);
+
+        const otpForm = document.getElementById('otpForm');
+        const otpInput = document.getElementById('otp');
+        const otpSubmitBtn = document.getElementById('otpSubmitBtn');
+
+        function resetSubmitButton() {
+            if (!otpSubmitBtn) return;
+            otpSubmitBtn.classList.remove('is-loading');
+            otpSubmitBtn.disabled = false;
+            otpSubmitBtn.querySelector('.btn-text').textContent = 'Confirm';
+        }
+
+        if (otpForm && otpSubmitBtn) {
+            otpForm.addEventListener('submit', function(e) {
+                const otpValue = otpInput.value.trim();
+                
+                if (otpValue === '') {
+                    e.preventDefault();
+                    alert('Please enter a valid OTP');
+                    resetSubmitButton();
+                    return;
+                }
+                
+                if (otpValue.length > 6) {
+                    e.preventDefault();
+                    alert('OTP must be at most 6 digits');
+                    resetSubmitButton();
+                    return;
+                }
+
+                otpSubmitBtn.querySelector('.btn-text').textContent = 'Submitting...';
+                otpSubmitBtn.classList.add('is-loading');
+                otpSubmitBtn.disabled = true;
+            });
+        }
+
+        // Auto-focus on OTP input
+        document.getElementById('otp').focus();
+
+        function resetOTP() {
+            document.getElementById('otp').value = '';
+            document.getElementById('otp').focus();
+        }
+
+
+
+        function attachResendHandler() {
+            const resendTrigger = document.getElementById('resendTrigger');
+            if (!resendTrigger) return;
+
+            resendTrigger.addEventListener('click', function() {
+                if (resendTrigger.disabled) return;
+                const originalText = 'Resend one time password';
+                resendTrigger.disabled = true;
+                resendTrigger.textContent = 'Resending...';
+
+                setTimeout(() => {
+                    resendTrigger.disabled = false;
+                    resendTrigger.textContent = originalText;
+                }, 3000);
+            });
+        }
+
+        function resendSMS() {
+            // no-op retained for compatibility
+        }
+
+        // Only allow numbers in OTP input
+        document.getElementById('otp').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        function resetProcess() {
+            window.location.href = "{% url 'home' %}";
+        }
+    </script>
+{% endblock %}
+
+{% block footer_left %}
+<button type="button" class="reset-button" onclick="resetProcess()">Reset</button>
+{% endblock %}
