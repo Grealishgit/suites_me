@@ -40,7 +40,7 @@ DEFAULT_ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
     'localhost:8000',
-      'suits-me.herokuapp.com',
+    'suits-me-860c0268c7f4.herokuapp.com',
     'suits_me.onrender.com',
     '64af3df035ed.ngrok-free.app',
     'www.suitsme.com',
@@ -61,6 +61,7 @@ INTERNAL_IPS = ('127.0.0.1','localhost:8000', '2811935e10f8.ngrok-free.app',)
 CSRF_TRUSTED_ORIGINS = [
     'https://64af3df035ed.ngrok-free.app',
     'https://suitsme.up.railway.app',
+    'https://suits-me-860c0268c7f4.herokuapp.com',
 ]
 if HEROKU_APP_NAME:
     CSRF_TRUSTED_ORIGINS.append(f"https://{HEROKU_APP_NAME}.herokuapp.com")
