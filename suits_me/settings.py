@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from pathlib import Path
 
+import dj_database_url
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -34,19 +36,37 @@ else:
     DEBUG = False
 
 
-ALLOWED_HOSTS = [
+DEFAULT_ALLOWED_HOSTS = [
     '127.0.0.1',
+    'localhost',
     'localhost:8000',
     'suits_me.onrender.com',
     '64af3df035ed.ngrok-free.app',
     'www.suitsme.com',
     'suitsme.up.railway.app',
-    ]
+]
+HEROKU_APP_NAME = os.getenv('HEROKU_APP_NAME')
+if HEROKU_APP_NAME:
+    DEFAULT_ALLOWED_HOSTS.append(f"{HEROKU_APP_NAME}.herokuapp.com")
+
+EXTRA_ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.getenv('ALLOWED_HOSTS', '').split(',')
+    if host.strip()
+]
+ALLOWED_HOSTS = DEFAULT_ALLOWED_HOSTS + EXTRA_ALLOWED_HOSTS
 INTERNAL_IPS = ('127.0.0.1','localhost:8000', '2811935e10f8.ngrok-free.app',)
 
 CSRF_TRUSTED_ORIGINS = [
     'https://64af3df035ed.ngrok-free.app',
-    'https://suitsme.up.railway.app'
+    'https://suitsme.up.railway.app',
+]
+if HEROKU_APP_NAME:
+    CSRF_TRUSTED_ORIGINS.append(f"https://{HEROKU_APP_NAME}.herokuapp.com")
+CSRF_TRUSTED_ORIGINS += [
+    origin.strip()
+    for origin in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
+    if origin.strip()
 ]
 # Application definition
 
@@ -106,10 +126,11 @@ WSGI_APPLICATION = 'suits_me.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600,
+        ssl_require=True,
+    )
 }
 
 # Password validation
