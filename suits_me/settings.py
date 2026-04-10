@@ -27,13 +27,9 @@ load_dotenv()
 
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
-ENVIRONMENT = os.getenv('ENVIRONMENT', default='production')
-ENVIRONMENT='production'
+ENVIRONMENT = os.getenv('ENVIRONMENT', 'production').strip().lower()
 # SECURITY WARNING: don't run with debug turned on in production!
-if ENVIRONMENT == 'development':
-    DEBUG = True
-else:
-    DEBUG = False
+DEBUG = ENVIRONMENT == 'development'
 
 
 DEFAULT_ALLOWED_HOSTS = [
@@ -127,12 +123,26 @@ WSGI_APPLICATION = 'suits_me.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600
-    )
-}
+if ENVIRONMENT == 'development':
+    # Keep local development independent from remote database availability.
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+else:
+    database_url = os.getenv('DATABASE_URL', '').strip()
+    if database_url and 'sslmode=' not in database_url and database_url.startswith(('postgres://', 'postgresql://')):
+        separator = '&' if '?' in database_url else '?'
+        database_url = f"{database_url}{separator}sslmode=require"
+
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=database_url or f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+            conn_max_age=600,
+        )
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
