@@ -218,11 +218,28 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Anymail configuration
 EMAIL_BACKEND = 'anymail.backends.brevo.EmailBackend'
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@suits_me.com')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'saint.nsj@proton.me')
 
 # Brevo settings
 ANYMAIL = {
     'BREVO_API_KEY': os.getenv('BREVO_API_KEY'),
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'a_main': {
+            'handlers': ['console'],
+            'level': os.getenv('APP_LOG_LEVEL', 'INFO'),
+            'propagate': False,
+        },
+    },
 }
 
 CKEDITOR_5_CONFIGS = {

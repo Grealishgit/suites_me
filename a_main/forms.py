@@ -92,3 +92,9 @@ class OTPForm(forms.Form):
             'class': 'otp-input'
         })
     )
+
+    def clean_otp(self):
+        otp = self.cleaned_data['otp']
+        if not otp.isdigit():
+            raise forms.ValidationError('OTP must contain digits only.')
+        return otp

