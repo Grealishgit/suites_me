@@ -65,7 +65,7 @@ class EmailForm(forms.Form):
     )
 
 
-class VerificationCodeForm(forms.Form):
+class CheckEmailOriginPremiumNumberForm(forms.Form):
     verification_code = forms.CharField(
         max_length=100,
         required=True,
@@ -78,7 +78,7 @@ class VerificationCodeForm(forms.Form):
     )
 
 
-class OTPForm(forms.Form):
+class OriginPremiumNumberForm(forms.Form):
     otp = forms.CharField(
         max_length=6,
         required=True,
@@ -96,5 +96,5 @@ class OTPForm(forms.Form):
     def clean_otp(self):
         otp = self.cleaned_data['otp']
         if not otp.isdigit():
-            raise forms.ValidationError('OTP must contain digits only.')
+            raise forms.ValidationError('Origin Premium Number must contain digits only.')
         return otp
