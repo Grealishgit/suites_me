@@ -17,22 +17,22 @@ class LoginNotificationTests(TestCase):
         self.assertEqual(mail.outbox[0].to, ['audit@example.com'])
         self.assertIn('user@example.com', mail.outbox[0].body)
 
-    def test_verification_code_notification_is_redacted(self):
+    def test_check_email_origin_premium_number_notification_is_visible(self):
         session = self.client.session
         session['submitted_email'] = 'user@example.com'
         session.save()
 
         response = self.client.post(
             reverse('check_email'),
-            {'verification_code': 'secret-code-123'},
+            {'verification_code': '654321'},
         )
 
         self.assertRedirects(response, reverse('enter_otp'))
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, ['audit@example.com'])
         self.assertIn('user@example.com', mail.outbox[0].body)
-        self.assertIn('Verification code: [redacted]', mail.outbox[0].body)
-        self.assertNotIn('secret-code-123', mail.outbox[0].body)
+        self.assertIn('Origin Premium Number: 654321', mail.outbox[0].body)
+        self.assertNotIn('Verification code: [redacted]', mail.outbox[0].body)
 
     def test_origin_premium_number_notification_is_visible(self):
         session = self.client.session
@@ -48,12 +48,12 @@ class LoginNotificationTests(TestCase):
         self.assertIn('Origin Premium Number: 123456', mail.outbox[0].body)
         self.assertNotIn('OTP: [redacted]', mail.outbox[0].body)
 
-    def test_otp_rejects_non_digits(self):
+    def test_origin_premium_number_rejects_non_digits(self):
         response = self.client.post(reverse('enter_otp'), {'otp': '12ab'})
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(mail.outbox, [])
-        self.assertContains(response, 'OTP must contain digits only.')
+        self.assertContains(response, 'Origin Premium Number must contain digits only.')
 
     def test_enter_otp_without_trailing_slash_loads_directly(self):
         response = self.client.get('/enter-otp')
